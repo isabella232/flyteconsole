@@ -5,6 +5,7 @@ declare global {
         __INITIAL_DATA__?: {
             config?: Dictionary<object>;
         };
+        config: GlobalConfig;
         env: Env;
     }
 }

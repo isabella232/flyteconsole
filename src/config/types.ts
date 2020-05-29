@@ -14,3 +14,12 @@ export interface Env extends NodeJS.ProcessEnv {
     DISABLE_ANALYTICS?: string;
     STATUS_URL?: string;
 }
+
+export type ConfigKey = 'adminApiUrl' | 'workflowExecutionsPaginationLimit';
+
+export interface GlobalConfig {
+    getValue<T>(key: ConfigKey, defaultValue?: T): T | undefined;
+    setOverride(key: ConfigKey, value: any): void;
+    clearOverride(key: ConfigKey): void;
+    clearAllOverrides(): void;
+}

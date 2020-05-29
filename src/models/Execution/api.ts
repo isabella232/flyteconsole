@@ -1,3 +1,4 @@
+import { globalConfig } from 'config/globalConfig';
 import { Admin, Core } from 'flyteidl';
 import {
     defaultPaginationConfig,
@@ -37,18 +38,26 @@ import {
 export const listExecutions = (
     scope: IdentifierScope,
     config?: RequestConfig
-) =>
-    getAdminEntity(
+) => {
+    const finalConfig = {
+        ...defaultPaginationConfig,
+        ...config
+    };
+    const limitOverride = globalConfig.getValue<number>(
+        'workflowExecutionsPaginationLimit'
+    );
+    if (limitOverride != null) {
+        finalConfig.limit = limitOverride;
+    }
+    return getAdminEntity(
         {
             path: makeIdentifierPath(endpointPrefixes.execution, scope),
             messageType: Admin.ExecutionList,
             transform: executionListTransformer
         },
-        {
-            ...defaultPaginationConfig,
-            ...config
-        }
+        finalConfig
     );
+};
 
 /** Fetches a single `Execution` record */
 export const getExecution = (

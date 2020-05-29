@@ -1,7 +1,7 @@
-import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
 import { createLocalURL, ensureSlashPrefixed } from 'common/utils';
 
+import { globalConfig } from 'config/globalConfig';
 import {
     AdminEntityTransformer,
     DecodableType,
@@ -17,8 +17,9 @@ const redirectParam = 'redirect_url';
 /** Converts a path into a full Admin API url */
 export function adminApiUrl(url: string) {
     const finalUrl = ensureSlashPrefixed(url);
-    if (env.ADMIN_API_URL) {
-        return `${env.ADMIN_API_URL}/api/v1${finalUrl}`;
+    const adminUrl = globalConfig.getValue('adminApiUrl');
+    if (adminUrl !== null) {
+        return `${adminUrl}/api/v1${finalUrl}`;
     }
     return createLocalURL(`/api/v1${finalUrl}`);
 }
@@ -27,18 +28,20 @@ export function adminApiUrl(url: string) {
  * to the current location after completing the flow.
  */
 export function getLoginUrl(redirectUrl: string = window.location.href) {
-    const baseUrl = env.ADMIN_API_URL
-        ? `${env.ADMIN_API_URL}${loginEndpoint}`
-        : createLocalURL(loginEndpoint);
+    const adminUrl = globalConfig.getValue('adminApiUrl');
+    const baseUrl =
+        adminUrl !== null
+            ? `${adminUrl}${loginEndpoint}`
+            : createLocalURL(loginEndpoint);
     return `${baseUrl}?${redirectParam}=${redirectUrl}`;
 }
 
 /** Constructs a URL for fetching the current user profile. */
 export function getProfileUrl() {
-    if (env.ADMIN_API_URL) {
-        return `${env.ADMIN_API_URL}${profileEndpoint}`;
-    }
-    return createLocalURL(profileEndpoint);
+    const adminUrl = globalConfig.getValue('adminApiUrl');
+    return adminUrl !== null
+        ? `${adminUrl}${profileEndpoint}`
+        : createLocalURL(profileEndpoint);
 }
 
 // Helper to log out the contents of a protobuf response, since the Network tab
